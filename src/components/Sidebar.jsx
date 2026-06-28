@@ -7,6 +7,14 @@ const LogoIcon = () => (
   </svg>
 )
 
+const SignOutIcon = () => (
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
+    <polyline points="16 17 21 12 16 7"/>
+    <line x1="21" y1="12" x2="9" y2="12"/>
+  </svg>
+)
+
 const ADMIN_NAV = [
   {
     label: 'Dashboard', to: '/dashboard', end: true,
@@ -29,7 +37,7 @@ const ADMIN_NAV = [
     icon: <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
   },
   {
-    label: 'Calculator', to: '/calculator', end: false,
+    label: 'Calc', to: '/calculator', end: false,
     icon: <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="9" y2="10"/><line x1="12" y1="10" x2="13" y2="10"/><line x1="16" y1="10" x2="17" y2="10"/><line x1="8" y1="14" x2="9" y2="14"/><line x1="12" y1="14" x2="13" y2="14"/><line x1="16" y1="14" x2="17" y2="14"/><line x1="8" y1="18" x2="9" y2="18"/><line x1="12" y1="18" x2="13" y2="18"/><line x1="16" y1="18" x2="17" y2="18"/></svg>
   },
 ]
@@ -44,11 +52,11 @@ const CUSTOMER_NAV = [
     icon: <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="2" y="3" width="20" height="18" rx="1"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
   },
   {
-    label: 'My Profile', to: '/profile', end: false,
+    label: 'Profile', to: '/profile', end: false,
     icon: <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
   },
   {
-    label: 'Contact Us', to: '/contact', end: false,
+    label: 'Contact', to: '/contact', end: false,
     icon: <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.68A2 2 0 012 .18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
   },
 ]
@@ -64,7 +72,7 @@ export default function Sidebar({ role }) {
 
   return (
     <>
-      {/* ── DESKTOP SIDEBAR ── */}
+      {/* ── DESKTOP SIDEBAR ─────────────────────────── */}
       <aside className="hidden md:flex flex-col fixed left-0 top-0 h-screen w-[260px] bg-[#111111] border-r border-white/[0.05] z-30">
 
         {/* Logo */}
@@ -117,44 +125,71 @@ export default function Sidebar({ role }) {
           ))}
         </nav>
 
-        {/* Sign out */}
+        {/* Sign out — desktop only */}
         <div className="px-3 py-4 border-t border-white/[0.05]">
           <button onClick={handleLogout}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-white/30 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/15 transition-all font-medium">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="flex-shrink-0">
-              <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
-            </svg>
+            <SignOutIcon />
             Sign Out
           </button>
         </div>
       </aside>
 
-      {/* ── MOBILE BOTTOM NAV ── */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-[#111111] border-t border-white/[0.05]">
-        <div className="flex overflow-x-auto">
+      {/* ── MOBILE TOP BAR (logo + sign out) ────────── */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-4 py-3 bg-[#111111] border-b border-white/[0.05]">
+        {/* Logo */}
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 gold-gradient rounded-lg flex items-center justify-center flex-shrink-0 glow-gold">
+            <LogoIcon />
+          </div>
+          <div>
+            <p className="text-white font-bold text-xs tracking-widest uppercase leading-tight">Lala Wood Works</p>
+            <p className="text-white/25 text-[9px]">Sakrand</p>
+          </div>
+        </div>
+
+        {/* Sign out button */}
+        <button onClick={handleLogout}
+          className="flex items-center gap-1.5 text-xs font-semibold text-white/35 hover:text-red-400 bg-white/[0.04] hover:bg-red-500/10 border border-white/[0.06] hover:border-red-500/20 px-3 py-2 rounded-xl transition-all">
+          <SignOutIcon />
+          <span>Sign Out</span>
+        </button>
+      </div>
+
+      {/* ── MOBILE BOTTOM NAV ───────────────────────── */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-[#111111] border-t border-white/[0.05]"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+        <div className="flex items-stretch h-16">
           {links.map(link => (
-            <NavLink key={link.to} to={link.to} end={link.end}
+            <NavLink
+              key={link.to}
+              to={link.to}
+              end={link.end}
               className={({ isActive }) =>
-                `flex-1 min-w-[60px] flex flex-col items-center justify-center py-2.5 gap-1 text-[9px] font-bold uppercase tracking-wide transition-all relative ${
-                  isActive ? 'text-[#D4A04A]' : 'text-white/25'
+                `flex-1 flex flex-col items-center justify-center gap-1 relative transition-all ${
+                  isActive ? 'text-[#D4A04A]' : 'text-white/30'
                 }`
               }>
               {({ isActive }) => (
                 <>
-                  {isActive && <span className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-[#D4A04A] rounded-b-full" />}
-                  <span className={isActive ? 'text-[#D4A04A]' : 'text-white/25'}>{link.icon}</span>
-                  {link.label}
+                  {/* Active indicator bar */}
+                  {isActive && (
+                    <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-[#D4A04A] rounded-b-full" />
+                  )}
+                  {/* Icon */}
+                  <span className={`transition-all ${isActive ? 'text-[#D4A04A] scale-110' : 'text-white/30'}`}>
+                    {link.icon}
+                  </span>
+                  {/* Label */}
+                  <span className={`text-[9px] font-bold uppercase tracking-wide leading-none ${
+                    isActive ? 'text-[#D4A04A]' : 'text-white/25'
+                  }`}>
+                    {link.label}
+                  </span>
                 </>
               )}
             </NavLink>
           ))}
-          <button onClick={handleLogout}
-            className="flex-1 min-w-[60px] flex flex-col items-center justify-center py-2.5 gap-1 text-[9px] font-bold uppercase tracking-wide text-white/25 hover:text-red-400 transition-all">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-              <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
-            </svg>
-            Out
-          </button>
         </div>
       </nav>
     </>

@@ -34,10 +34,14 @@
   .page-shell { @apply min-h-screen bg-[#0f0f0f]; }
   .main-content { @apply md:ml-[260px] min-h-screen; }
 
+  /* On mobile, push content below the fixed top bar (52px) */
+  .main-content > .topbar {
+    @apply top-[52px] md:top-0;
+  }
   /* Topbar */
   .topbar {
     @apply sticky top-0 z-20 flex items-center justify-between
-           px-6 py-4 bg-[#111111] border-b border-white/[0.05];
+           px-4 md:px-6 py-3.5 md:py-4 bg-[#111111] border-b border-white/[0.05];
   }
   .topbar-title { @apply text-lg font-bold text-white; }
   .topbar-sub   { @apply text-xs text-white/35 mt-0.5; }
