@@ -70,7 +70,7 @@ export default function Dashboard({ role }) {
       {/* offset for mobile top bar */}
       <div className="main-content pt-0 md:pt-0">
 
-        <div className="topbar mt-[52px] md:mt-0">
+        <div className="topbar">
           <div>
             <h1 className="topbar-title">Dashboard</h1>
             <p className="topbar-sub">Welcome back, Admin</p>
