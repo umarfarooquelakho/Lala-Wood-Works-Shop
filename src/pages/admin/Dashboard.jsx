@@ -86,13 +86,27 @@ export default function Dashboard({ role }) {
         <div className="p-4 md:p-6 space-y-4 md:space-y-6 pb-24 md:pb-6">
 
           {loading ? (
-            <div className="grid grid-cols-2 gap-3">
-              {[1,2,3,4].map(i => (
-                <div key={i} className="stat-card">
-                  <div className="skeleton h-3 w-20 mb-2"/>
-                  <div className="skeleton h-7 w-24"/>
-                </div>
-              ))}
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                {[1,2,3,4].map(i => (
+                  <div key={i} className="stat-card">
+                    <div className="skeleton h-3 w-16 mb-3 rounded"/>
+                    <div className="skeleton h-7 w-20 rounded"/>
+                  </div>
+                ))}
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {[1,2,3].map(i => (
+                  <div key={i} className="stat-card">
+                    <div className="skeleton h-3 w-20 mb-3 rounded"/>
+                    <div className="skeleton h-7 w-28 rounded"/>
+                  </div>
+                ))}
+              </div>
+              <div className="card p-4">
+                <div className="skeleton h-4 w-40 mb-4 rounded"/>
+                <div className="skeleton h-44 w-full rounded-xl"/>
+              </div>
             </div>
           ) : (
             <>
