@@ -137,19 +137,6 @@ Set environment variables in Netlify dashboard:
 - `VITE_SUPABASE_URL`
 - `VITE_SUPABASE_ANON_KEY`
 
----
 
-## 📞 Contact
 
-**Lala Wood Works — Sakrand, Sindh**
-
-| Name | Phone |
-|---|---|
-| Haji Muhammad | 0300 3231992 |
-| Sher Muhammad | 0304 7909931 |
-| Ali | 0303 6276320 |
-| Haroon | 0308 8482975 |
-
----
-
-<p align="center">Built with ❤️ for Lala Wood Works, Sakrand</p>
+<p align="center">Built By Umar Farooque for Lala Wood Works Shop, Sakrand</p>
