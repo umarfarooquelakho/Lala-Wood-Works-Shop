@@ -26,17 +26,33 @@ export default function CustProfile({ role }) {
     const [{ data: prof }, { data: ords }, { data: favs }] = await Promise.all([
       supabase.from('profiles').select('*').eq('id', user.id).single(),
       supabase.from('orders').select('*, order_doors(*), order_windows(*)').eq('customer_email', user.email).order('created_at', { ascending: false }),
-      supabase.from('favorites').select('*, doors(*), windows(*)').eq('user_id', user.id),
+      supabase.from('favorites').select('id, item_id, category').eq('user_id', user.id),
     ])
 
     setProfile({ ...prof, email: user.email })
+    setOrders(ords || [])
 
-    // Also try matching by customer_name if email not stored
-    const allOrders = ords || []
-    setOrders(allOrders)
+    // Fetch door/window details for each favourite separately
+    const rawFavs = favs || []
+    const doorFavIds   = rawFavs.filter(f => f.category === 'door').map(f => f.item_id)
+    const windowFavIds = rawFavs.filter(f => f.category === 'window').map(f => f.item_id)
 
-    const favDoors   = (favs || []).filter(f => f.category === 'door')
-    const favWindows = (favs || []).filter(f => f.category === 'window')
+    const [{ data: doorDetails }, { data: windowDetails }] = await Promise.all([
+      doorFavIds.length > 0
+        ? supabase.from('doors').select('id, name, material, image_url, price_from').in('id', doorFavIds)
+        : Promise.resolve({ data: [] }),
+      windowFavIds.length > 0
+        ? supabase.from('windows').select('id, name, material, image_url, price_from, window_type').in('id', windowFavIds)
+        : Promise.resolve({ data: [] }),
+    ])
+
+    // Merge fav record with item details
+    const doorMap   = Object.fromEntries((doorDetails   || []).map(d => [d.id, d]))
+    const windowMap = Object.fromEntries((windowDetails || []).map(w => [w.id, w]))
+
+    const favDoors   = rawFavs.filter(f => f.category === 'door').map(f => ({ ...f, item: doorMap[f.item_id]   || null }))
+    const favWindows = rawFavs.filter(f => f.category === 'window').map(f => ({ ...f, item: windowMap[f.item_id] || null }))
+
     setFavorites({ doors: favDoors, windows: favWindows })
     setLoading(false)
   }
@@ -205,14 +221,22 @@ export default function CustProfile({ role }) {
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                         {favorites.doors.map(fav => (
                           <div key={fav.id} className="card-hover overflow-hidden">
-                            {fav.doors?.image_url && <img src={fav.doors.image_url} alt={fav.doors?.name} className="w-full h-32 object-cover"/>}
-                            <div className="p-3 flex items-center justify-between">
-                              <div>
-                                <p className="text-sm font-semibold text-white">{fav.doors?.name || '—'}</p>
-                                {fav.doors?.material && <p className="text-xs text-white/30">{fav.doors.material}</p>}
+                            {fav.item?.image_url
+                              ? <img src={fav.item.image_url} alt={fav.item?.name} className="w-full h-32 object-cover"/>
+                              : <div className="w-full h-32 bg-white/[0.03] flex items-center justify-center">
+                                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-white/10"><rect x="3" y="1" width="18" height="22" rx="1"/></svg>
+                                </div>
+                            }
+                            <div className="p-3 flex items-center justify-between gap-2">
+                              <div className="min-w-0">
+                                <p className="text-sm font-semibold text-white truncate">{fav.item?.name || '—'}</p>
+                                <div className="flex flex-wrap gap-1 mt-0.5">
+                                  {fav.item?.material && <p className="text-xs text-white/30">{fav.item.material}</p>}
+                                  {fav.item?.price_from && <p className="text-xs text-[#D4A04A]">Rs. {Number(fav.item.price_from).toLocaleString()}</p>}
+                                </div>
                               </div>
-                              <button onClick={() => removeFav(fav.id)} className="text-red-400 hover:text-red-300 p-1.5 rounded-lg hover:bg-red-500/10 transition-all">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="0"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                              <button onClick={() => removeFav(fav.id)} title="Remove from favourites" className="text-red-400 hover:text-red-300 p-1.5 rounded-lg hover:bg-red-500/10 transition-all flex-shrink-0">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
                               </button>
                             </div>
                           </div>
@@ -226,14 +250,23 @@ export default function CustProfile({ role }) {
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                         {favorites.windows.map(fav => (
                           <div key={fav.id} className="card-hover overflow-hidden">
-                            {fav.windows?.image_url && <img src={fav.windows.image_url} alt={fav.windows?.name} className="w-full h-32 object-cover"/>}
-                            <div className="p-3 flex items-center justify-between">
-                              <div>
-                                <p className="text-sm font-semibold text-white">{fav.windows?.name || '—'}</p>
-                                {fav.windows?.material && <p className="text-xs text-white/30">{fav.windows.material}</p>}
+                            {fav.item?.image_url
+                              ? <img src={fav.item.image_url} alt={fav.item?.name} className="w-full h-32 object-cover"/>
+                              : <div className="w-full h-32 bg-white/[0.03] flex items-center justify-center">
+                                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-white/10"><rect x="2" y="3" width="20" height="18" rx="1"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
+                                </div>
+                            }
+                            <div className="p-3 flex items-center justify-between gap-2">
+                              <div className="min-w-0">
+                                <p className="text-sm font-semibold text-white truncate">{fav.item?.name || '—'}</p>
+                                <div className="flex flex-wrap gap-1 mt-0.5">
+                                  {fav.item?.window_type && <span className="text-xs badge badge-blue">{fav.item.window_type}</span>}
+                                  {fav.item?.material && <p className="text-xs text-white/30">{fav.item.material}</p>}
+                                  {fav.item?.price_from && <p className="text-xs text-[#D4A04A]">Rs. {Number(fav.item.price_from).toLocaleString()}</p>}
+                                </div>
                               </div>
-                              <button onClick={() => removeFav(fav.id)} className="text-red-400 hover:text-red-300 p-1.5 rounded-lg hover:bg-red-500/10 transition-all">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="0"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                              <button onClick={() => removeFav(fav.id)} title="Remove from favourites" className="text-red-400 hover:text-red-300 p-1.5 rounded-lg hover:bg-red-500/10 transition-all flex-shrink-0">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
                               </button>
                             </div>
                           </div>
